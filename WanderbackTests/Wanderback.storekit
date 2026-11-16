@@ -1,0 +1,77 @@
+{
+  "identifier": "8E1C6A52-3B7D-4C1E-9A2F-5D6B7C8E9F01",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "0.99",
+      "familyShareable": false,
+      "internalID": "67400000001",
+      "localizations": [
+        {
+          "description": "Un expresso pour le développeur",
+          "displayName": "Petit café",
+          "locale": "fr_FR"
+        },
+        {
+          "description": "An espresso for the developer",
+          "displayName": "Small coffee",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.bastien.Wanderback.tip.small",
+      "referenceName": "Petit café",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "67400000002",
+      "localizations": [
+        {
+          "description": "De quoi tenir une soirée de code",
+          "displayName": "Grand café",
+          "locale": "fr_FR"
+        },
+        {
+          "description": "Enough for an evening of coding",
+          "displayName": "Large coffee",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.bastien.Wanderback.tip.medium",
+      "referenceName": "Grand café",
+      "type": "Consumable"
+    },
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "67400000003",
+      "localizations": [
+        {
+          "description": "Le petit-déjeuner complet",
+          "displayName": "Café et croissant",
+          "locale": "fr_FR"
+        },
+        {
+          "description": "The full breakfast",
+          "displayName": "Coffee and croissant",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.bastien.Wanderback.tip.large",
+      "referenceName": "Café et croissant",
+      "type": "Consumable"
+    }
+  ],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_locale": "fr_FR",
+    "_storefront": "FRA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}
