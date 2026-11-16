@@ -7,6 +7,8 @@ struct HomeView: View {
     @State private var selectedMode: GameMode = .souvenir
     @State private var selectedRounds: Int = 10
     @State private var mosaicImages: [PlatformImage] = []
+    @State private var showsSupport = false
+    @Environment(TipStore.self) private var tipStore
     @FocusState private var focusedElement: HomeElement?
 
     private let roundOptions = [5, 10, 20]
@@ -15,6 +17,7 @@ struct HomeView: View {
         case mode(GameMode)
         case rounds(Int)
         case play
+        case support
     }
 
     var body: some View {
@@ -39,7 +42,9 @@ struct HomeView: View {
             #endif
             .padding(.horizontal, Device.isPhone ? 24.scaled : 0)
         }
+        .overlay(alignment: .topTrailing) { supportButton }
         .initialFocus($focusedElement, .play)
+        .supportPresentation(isPresented: $showsSupport)
         .task {
             #if DEBUG
             // Dev uniquement : masque les photos personnelles de la mosaïque (capture d'écran
@@ -49,11 +54,14 @@ struct HomeView: View {
             // dégradé `Theme.backgroundTop → Theme.backgroundBottom`.
             if ProcessInfo.processInfo.arguments.contains("-noMosaic") { return }
             #endif
+            // Nouvel essai si la boutique était injoignable au lancement (sans effet sinon)
+            async let tips: Void = tipStore.loadProducts()
             mosaicImages = await PhotoImageLoader.shared.loadRandomImages(
                 from: viewModel.photoLocations,
                 count: 10,
                 targetSize: CGSize(width: 500, height: 400)
             )
+            await tips
         }
     }
 
@@ -63,10 +71,14 @@ struct HomeView: View {
     /// Appelé uniquement sur macOS (cf. `macMoveCommand`) ; tvOS garde son moteur de focus natif.
     #if os(macOS)
     private func handleMoveCommand(_ direction: MoveCommandDirection) {
-        guard let current = focusedElement else { return }
+        guard !showsSupport, let current = focusedElement else { return }
         switch current {
+        case .support:
+            if direction == .down { focusedElement = .mode(selectedMode) }
         case .mode(let mode):
             switch direction {
+            case .up:
+                if tipStore.isAvailable { focusedElement = .support }
             case .left, .right:
                 let modes = GameMode.allCases
                 guard let index = modes.firstIndex(of: mode) else { return }
@@ -100,7 +112,7 @@ struct HomeView: View {
 
     /// Active l'élément actuellement en surbrillance (Espace) : même effet que cliquer dessus.
     private func activateFocusedElement() {
-        guard let current = focusedElement else { return }
+        guard !showsSupport, let current = focusedElement else { return }
         activate(current)
     }
 
@@ -114,6 +126,8 @@ struct HomeView: View {
             withAnimation(Theme.focusAnimation) { selectedRounds = count }
         case .play:
             onPlay(selectedMode, selectedRounds)
+        case .support:
+            showsSupport = true
         }
     }
 
@@ -314,6 +328,46 @@ struct HomeView: View {
     }
 }
 
+// MARK: - Soutien
+
+extension HomeView {
+    /// Accès discret à l'écran « Soutenir Wanderback », masqué tant que la boutique n'a
+    /// renvoyé aucun produit (produits pas encore créés, App Store injoignable…).
+    @ViewBuilder
+    fileprivate var supportButton: some View {
+        if tipStore.isAvailable {
+            Button {
+                activate(.support)
+            } label: {
+                HStack(spacing: 10.scaled) {
+                    Image(systemName: "heart.fill")
+                    Text("Soutenir")
+                }
+            }
+            .buttonStyle(SecondaryPillButtonStyle(horizontalPadding: 30, verticalPadding: 14, fontSize: 20))
+            .macFocusable()
+            .focused($focusedElement, equals: .support)
+            .macFocusOnHover($focusedElement, equals: .support)
+            .accessibilityLabel("Soutenir Wanderback")
+            .padding(.top, Device.isPhone ? 8 : 40.scaled)
+            .padding(.trailing, Device.isPhone ? 16 : 48.scaled)
+            .transition(.opacity)
+        }
+    }
+}
+
+private extension View {
+    /// Feuille sur iPhone, iPad et Mac ; plein écran sur Apple TV, où les feuilles n'existent pas.
+    @ViewBuilder
+    func supportPresentation(isPresented: Binding<Bool>) -> some View {
+        #if os(tvOS)
+        self.fullScreenCover(isPresented: isPresented) { SupportView() }
+        #else
+        self.sheet(isPresented: isPresented) { SupportView() }
+        #endif
+    }
+}
+
 // MARK: - Styles
 
 /// Tuile mode 500pt : dégradé sombre par mode, bordure blanche 4pt si sélectionnée.
@@ -398,4 +452,5 @@ private struct RoundCircleButtonStyle: ButtonStyle {
 
 #Preview {
     HomeView(viewModel: PhotoLibraryViewModel()) { _, _ in }
+        .environment(TipStore.shared)
 }

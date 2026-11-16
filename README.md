@@ -34,6 +34,7 @@ Wanderback est une application tvOS, macOS et iOS (iPhone et iPad) qui pioche da
 - **CoreLocation / CLGeocoder** — géocodage inverse (GPS → nom de ville)
 - **MapKit** — carte animée sur l'écran de révélation
 - **SwiftData** — cache local (index des lieux géocodés)
+- **StoreKit 2** — achats intégrés facultatifs « Offre-moi un café » (3 pourboires consommables)
 
 ## Structure du projet
 
@@ -47,12 +48,31 @@ wanderback/
 │   ├── Views/                  # HomeView, GameView, RevealView...
 │   ├── Services/               # PhotoIndexer, GeocoderService, QuestionGenerator
 │   └── Persistence/            # LocationCache (SwiftData)
+├── WanderbackTests/            # Tests unitaires + Wanderback.storekit (boutique locale)
 └── docs/
 ```
 
 ## Démarrage
 
 Voir [`docs/technique-et-setup.md`](docs/technique-et-setup.md) — section **4. Démarrage du Projet Xcode**.
+
+## Tests
+
+Tests unitaires (Swift Testing) dans `WanderbackTests/`, rattachés aux schémas `WanderbackMac`
+(cible `WanderbackTests`) et `WanderbackiOS` (cible `WanderbackiOSTests`) :
+
+```sh
+xcodebuild -project Wanderback.xcodeproj -scheme WanderbackMac -destination 'platform=macOS' test
+```
+
+### Achats intégrés en local
+
+`WanderbackTests/Wanderback.storekit` décrit les trois pourboires (`com.bastien.Wanderback.tip.small`,
+`.tip.medium`, `.tip.large`). Il est branché sur l'action *Run* des schémas `WanderbackiOS` et
+`WanderbackMac` : lancée depuis Xcode, l'app achète sur cette boutique locale, sans App Store ni
+paiement réel (menu *Debug › StoreKit › Manage Transactions* pour voir les achats). Les tests
+`StoreKitTipBackendTests` l'utilisent via `SKTestSession`. En production, les produits viennent
+d'App Store Connect ; tant qu'ils n'y existent pas, le bouton « Soutenir » de l'accueil reste masqué.
 
 ## Roadmap
 
