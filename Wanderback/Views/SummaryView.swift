@@ -2,6 +2,7 @@ import SwiftUI
 import MapKit
 
 struct SummaryView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     let gameViewModel: GameViewModel
     /// Retour à l'accueil pour changer de mode
     let onChangeMode: () -> Void
@@ -131,7 +132,7 @@ struct SummaryView: View {
         ]
 
         return Group {
-            if Device.isPhone {
+            if layoutStyle.isCompact {
                 // ~435 pt cumulés : les trois stats ne tiennent pas sur une rangée
                 VStack(spacing: 8.scaled) {
                     ForEach(Array(items.enumerated()), id: \.offset) { _, item in item }
@@ -179,7 +180,7 @@ struct SummaryView: View {
     /// l'effet d'échelle à l'appui appliqué. Empilés sur téléphone.
     @ViewBuilder
     private var summaryButtons: some View {
-        if Device.isPhone {
+        if layoutStyle.isCompact {
             VStack(spacing: 16.scaled) {
                 replayButton
                 changeModeButton

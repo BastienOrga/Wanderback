@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     @State private var photoViewModel = PhotoLibraryViewModel()
     @State private var gameViewModel = GameViewModel()
     @Environment(\.modelContext) private var modelContext
@@ -131,7 +132,7 @@ struct ContentView: View {
                 .font(.system(size: 28.scaled))
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, (Device.isPhone ? 24 : 200).scaled)
+                .padding(.horizontal, (layoutStyle.isCompact ? 24 : 200).scaled)
         }
     }
 }

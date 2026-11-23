@@ -3,6 +3,7 @@ import SwiftUI
 /// Écran « Soutenir Wanderback » : un mot de Bastien et les trois pourboires
 /// « Offre-moi un café », avec leur prix localisé fourni par StoreKit.
 struct SupportView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     @Environment(TipStore.self) private var tipStore
     @Environment(\.dismiss) private var dismiss
 
@@ -20,7 +21,7 @@ struct SupportView: View {
                     closeButton
                 }
                 .frame(maxWidth: 1000.scaled)
-                .padding(.horizontal, Device.isPhone ? 24 : 60.scaled)
+                .padding(.horizontal, layoutStyle.isCompact ? 24 : 60.scaled)
                 .padding(.vertical, 60.scaled)
                 .frame(maxWidth: .infinity)
             }

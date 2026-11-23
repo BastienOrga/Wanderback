@@ -2,6 +2,7 @@ import SwiftUI
 import MapKit
 
 struct RevealView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     let gameViewModel: GameViewModel
 
     @State private var cameraPosition: MapCameraPosition
@@ -45,7 +46,7 @@ struct RevealView: View {
 
             VStack {
                 Spacer()
-                if Device.isPhone {
+                if layoutStyle.isCompact {
                     // 344 pt de vignettes + le bouton ne tiennent pas sur une rangée
                     VStack(spacing: 20.scaled) {
                         sameDayThumbnails
@@ -59,7 +60,7 @@ struct RevealView: View {
                     }
                 }
             }
-            .padding(.horizontal, (Device.isPhone ? 24 : 56).scaled)
+            .padding(.horizontal, (layoutStyle.isCompact ? 24 : 56).scaled)
             .padding(.bottom, 44.scaled)
             .tvIgnoresSafeArea()
         }
@@ -106,8 +107,8 @@ struct RevealView: View {
                 .init(color: Theme.backgroundBottom.opacity(0.88), location: 1)
             ],
             center: .center,
-            startRadius: Device.isPhone ? 60 : 200,
-            endRadius: Device.isPhone ? 440 : 1200
+            startRadius: layoutStyle.isCompact ? 60 : 200,
+            endRadius: layoutStyle.isCompact ? 440 : 1200
         )
         .allowsHitTesting(false)
     }
@@ -155,7 +156,7 @@ struct RevealView: View {
     private var centerContent: some View {
         VStack(spacing: 16.scaled) {
             Text(round?.correctAnswer.displayName.uppercased() ?? "")
-                .font(.system(size: (Device.isPhone ? 76 : 104).scaled, weight: .heavy))
+                .font(.system(size: (layoutStyle.isCompact ? 76 : 104).scaled, weight: .heavy))
                 .tracking(4)
                 .foregroundStyle(.white)
                 .lineLimit(1)
@@ -176,7 +177,7 @@ struct RevealView: View {
                     .padding(.top, 8.scaled)
             }
         }
-        .padding(.horizontal, (Device.isPhone ? 32 : 70).scaled)   // padding interne du cartouche
+        .padding(.horizontal, (layoutStyle.isCompact ? 32 : 70).scaled)   // padding interne du cartouche
         .padding(.vertical, 40.scaled)
         .background {
             // Cartouche translucide : garde titre, lieu et date lisibles sur la carte
@@ -189,8 +190,8 @@ struct RevealView: View {
                 .strokeBorder(Color.white.opacity(0.14), lineWidth: 2)
         )
         .shadow(color: Theme.tileShadow, radius: 30, y: 20)
-        .padding(.top, (Device.isPhone ? 190 : 280).scaled)  // sous le pin
-        .padding(.horizontal, (Device.isPhone ? 24 : 100).scaled)
+        .padding(.top, (layoutStyle.isCompact ? 190 : 280).scaled)  // sous le pin
+        .padding(.horizontal, (layoutStyle.isCompact ? 24 : 100).scaled)
         .opacity(contentRevealed ? 1 : 0)
         .offset(y: contentRevealed ? 0 : 30)
     }
@@ -214,7 +215,7 @@ struct RevealView: View {
     private var sameDayThumbnails: some View {
         if !sameDayImages.isEmpty {
             let side: (width: CGFloat, height: CGFloat) =
-                Device.isPhone ? (110, 74) : (148, 100)
+                layoutStyle.isCompact ? (110, 74) : (148, 100)
 
             let row = HStack(alignment: .bottom, spacing: 14.scaled) {
                 ForEach(Array(sameDayImages.enumerated()), id: \.offset) { _, image in
@@ -231,7 +232,7 @@ struct RevealView: View {
 
                 // Sur iPhone le libellé passe sous la rangée : à droite, il la
                 // pousserait hors de l'écran.
-                if !Device.isPhone {
+                if !layoutStyle.isCompact {
                     Text("photos du\nmême jour")
                         .font(.system(size: 19.scaled))
                         .foregroundStyle(Theme.textTertiary)
@@ -240,7 +241,7 @@ struct RevealView: View {
             }
 
             Group {
-                if Device.isPhone {
+                if layoutStyle.isCompact {
                     VStack(spacing: 8.scaled) {
                         row
                         Text("photos du même jour")

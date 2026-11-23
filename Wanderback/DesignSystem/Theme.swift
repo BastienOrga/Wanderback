@@ -70,13 +70,35 @@ enum Theme {
     /// carte réponse à 6 pt. Un téléphone se regarde d'aussi près qu'un iPad, donc
     /// sa typo reste dans les mêmes eaux ; ce qui manque, c'est la largeur — traitée
     /// écran par écran par des layouts fluides, pas par le facteur d'échelle.
+    ///
+    /// Sur iOS, le facteur suit la largeur de la fenêtre (`scale(forWindowWidth:)`),
+    /// mesurée à la racine et gardée dans `LayoutMetrics`.
     #if os(macOS)
     static let scale: CGFloat = 0.62
     #elseif os(iOS)
-    static let scale: CGFloat = Device.isPhone ? 0.58 : 0.7
+    static var scale: CGFloat { LayoutMetrics.shared.scale }
     #else
     static let scale: CGFloat = 1.0
     #endif
+
+    /// Bornes de l'échelle iOS : largeur de fenêtre (pt) → facteur.
+    /// Jusqu'au plus large iPhone (Pro Max, 440 pt) : 0,58, valeur historique iPhone.
+    /// Dès le plus étroit des iPad plein écran (iPad mini en portrait, 744 pt ; le
+    /// verrou paysage ne s'applique pas en mode fenêtré d'iPadOS 26) : 0,7, valeur
+    /// historique iPad. Entre les deux (Split View, Stage Manager, iPhone pliable
+    /// ouvert) : interpolation linéaire.
+    static let compactScale: (width: CGFloat, scale: CGFloat) = (440, 0.58)
+    static let largeScale: (width: CGFloat, scale: CGFloat) = (744, 0.7)
+
+    /// Facteur d'échelle iOS pour une fenêtre de cette largeur : continu, croissant,
+    /// borné entre 0,58 et 0,7. Fonction pure, testée sur toutes les plateformes.
+    static func scale(forWindowWidth width: CGFloat) -> CGFloat {
+        let low = compactScale, high = largeScale
+        guard width > low.width else { return low.scale }
+        guard width < high.width else { return high.scale }
+        let progress = (width - low.width) / (high.width - low.width)
+        return low.scale + progress * (high.scale - low.scale)
+    }
 }
 
 extension Color {
@@ -102,13 +124,15 @@ extension Int {
 
 /// Fond radial commun à tous les écrans : #232048 (haut) vers #131226.
 struct SceneBackground: View {
+    @Environment(\.layoutStyle) private var layoutStyle
+
     var body: some View {
         RadialGradient(
             colors: [Theme.backgroundTop, Theme.backgroundBottom],
             center: .init(x: 0.5, y: 0.25),
             startRadius: 0,
             // Rayon en points bruts : il doit couvrir l'écran, pas le canvas de design
-            endRadius: Device.isPhone ? 520 : 1400
+            endRadius: layoutStyle.isCompact ? 520 : 1400
         )
         .ignoresSafeArea()
     }

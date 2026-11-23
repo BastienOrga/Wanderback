@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct GameView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     let gameViewModel: GameViewModel
 
     @State private var roundImage: PlatformImage?
@@ -40,8 +41,8 @@ struct GameView: View {
                 // entre les deux, et non au milieu de l'écran. Sans la réserve haute,
                 // une photo horizontale — qui n'a jamais atteint les cartes — serait
                 // remontée pour rien. Le fond flouté, lui, reste plein cadre.
-                let topZone = Device.isPhone ? geometry.size.height * 0.14 : 0
-                let answersZone = Device.isPhone ? geometry.size.height * 0.28 : 0
+                let topZone = layoutStyle.isCompact ? geometry.size.height * 0.14 : 0
+                let answersZone = layoutStyle.isCompact ? geometry.size.height * 0.28 : 0
 
                 ZStack {
                     Image(platformImage: roundImage)
@@ -82,8 +83,8 @@ struct GameView: View {
         LinearGradient(
             stops: [
                 .init(color: scrimColor.opacity(0.6), location: 0),
-                .init(color: .clear, location: Device.isPhone ? 0.10 : 0.18),
-                .init(color: .clear, location: Device.isPhone ? 0.66 : 0.52),
+                .init(color: .clear, location: layoutStyle.isCompact ? 0.10 : 0.18),
+                .init(color: .clear, location: layoutStyle.isCompact ? 0.66 : 0.52),
                 .init(color: scrimColor.opacity(0.92), location: 1)
             ],
             startPoint: .top,
@@ -98,15 +99,15 @@ struct GameView: View {
             // Sur iPhone, la largeur est comptée : le logo cède la place au chrono
             // et au score, et la croix « fermer » (overlay de ContentView) occupe
             // seule le coin haut gauche.
-            if !Device.isPhone {
+            if !layoutStyle.isCompact {
                 GradientText(text: "WANDERBACK", size: 28, tracking: -0.5)
                     // Sur iPad, la croix « fermer » flotte en overlay top-leading
                     // (ContentView) par-dessus cette barre : marge additionnelle
                     // pour éviter qu'elle ne chevauche le "W" du logo. Ce `#if
                     // os(iOS)` n'existe tout simplement pas dans les builds
                     // tvOS/macOS (ce n'est pas une histoire de croix absente
-                    // là-bas) ; sur iOS, il ne s'applique qu'à l'iPad puisque
-                    // le `if !Device.isPhone` englobant exclut déjà l'iPhone.
+                    // là-bas) ; sur iOS, il ne s'applique qu'en mise en page large puisque
+                    // le `if !layoutStyle.isCompact` englobant exclut déjà le compact.
                     #if os(iOS)
                     .padding(.leading, 44.scaled)
                     #endif
@@ -114,9 +115,9 @@ struct GameView: View {
 
             Spacer()
 
-            HStack(spacing: Device.isPhone ? 18.scaled : 32.scaled) {
+            HStack(spacing: layoutStyle.isCompact ? 18.scaled : 32.scaled) {
                 // Le numéro courant reste en gras dans les deux variantes
-                Text(Device.isPhone
+                Text(layoutStyle.isCompact
                      ? "\(Text("\(currentRoundNumber)").bold())/\(totalRounds)"
                      : "Round \(Text("\(currentRoundNumber)").bold())/\(totalRounds)")
                     .font(.system(size: 24.scaled))
@@ -133,7 +134,7 @@ struct GameView: View {
         }
         // Marge iPhone à 28 (et non 24, valeur de départ) : sur SE, « 0 pts »
         // frôlait le bord droit — amendement relevé tâche 9.
-        .padding(.horizontal, Device.isPhone ? 28.scaled : 56.scaled)
+        .padding(.horizontal, layoutStyle.isCompact ? 28.scaled : 56.scaled)
         .padding(.vertical, 36.scaled)
     }
 
@@ -174,7 +175,7 @@ struct GameView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Device.isPhone ? 24.scaled : 56.scaled)
+        .padding(.horizontal, layoutStyle.isCompact ? 24.scaled : 56.scaled)
         .padding(.bottom, 44.scaled)
     }
 
