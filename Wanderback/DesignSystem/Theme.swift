@@ -83,11 +83,12 @@ enum Theme {
 
     /// Bornes de l'échelle iOS : largeur de fenêtre (pt) → facteur.
     /// Jusqu'au plus large iPhone (Pro Max, 440 pt) : 0,58, valeur historique iPhone.
-    /// Dès un iPad plein écran en paysage (1133 pt pour l'iPad mini) : 0,7, valeur
+    /// Dès le plus étroit des iPad plein écran (iPad mini en portrait, 744 pt ; le
+    /// verrou paysage ne s'applique pas en mode fenêtré d'iPadOS 26) : 0,7, valeur
     /// historique iPad. Entre les deux (Split View, Stage Manager, iPhone pliable
     /// ouvert) : interpolation linéaire.
     static let compactScale: (width: CGFloat, scale: CGFloat) = (440, 0.58)
-    static let largeScale: (width: CGFloat, scale: CGFloat) = (1000, 0.7)
+    static let largeScale: (width: CGFloat, scale: CGFloat) = (744, 0.7)
 
     /// Facteur d'échelle iOS pour une fenêtre de cette largeur : continu, croissant,
     /// borné entre 0,58 et 0,7. Fonction pure, testée sur toutes les plateformes.

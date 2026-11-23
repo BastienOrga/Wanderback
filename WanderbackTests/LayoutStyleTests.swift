@@ -31,15 +31,16 @@ struct LayoutStyleTests {
         #expect(Theme.scale(forWindowWidth: width) == 0.58)
     }
 
-    /// Rendu historique conservé : 0,7 sur tous les iPad plein écran (paysage).
-    @Test(arguments: [1000, 1133, 1180, 1210, 1366, 1376, 2000] as [CGFloat])
+    /// Rendu historique conservé : 0,7 sur tous les iPad plein écran, en portrait
+    /// (744 pt pour l'iPad mini, 1032 pt pour l'iPad Pro 13") comme en paysage.
+    @Test(arguments: [744, 820, 834, 1032, 1133, 1180, 1210, 1366, 1376, 2000] as [CGFloat])
     func echelleDesIPadPleinEcranInchangee(width: CGFloat) {
         #expect(Theme.scale(forWindowWidth: width) == 0.7)
     }
 
     @Test func echelleContinueEntreLesBornes() {
-        // Milieu exact de l'intervalle 440 → 1000 pt
-        #expect(abs(Theme.scale(forWindowWidth: 720) - 0.64) < 0.0001)
+        // Milieu exact de l'intervalle 440 → 744 pt
+        #expect(abs(Theme.scale(forWindowWidth: 592) - 0.64) < 0.0001)
 
         var previous = Theme.scale(forWindowWidth: 400)
         for width in stride(from: 401, through: 1100, by: 1) {
@@ -59,10 +60,10 @@ struct LayoutStyleTests {
 
     @Test func mesuresGardentLaLargeur() {
         let metrics = LayoutMetrics()
-        metrics.update(windowWidth: 820)
-        #expect(metrics.windowWidth == 820)
+        metrics.update(windowWidth: 669)
+        #expect(metrics.windowWidth == 669)
         #if os(iOS)
-        #expect(metrics.scale == Theme.scale(forWindowWidth: 820))
+        #expect(metrics.scale == Theme.scale(forWindowWidth: 669))
         #elseif os(macOS)
         // macOS : échelle fixe, la largeur ne la change pas
         #expect(metrics.scale == 0.62)
