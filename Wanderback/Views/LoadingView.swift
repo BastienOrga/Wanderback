@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LoadingView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     let viewModel: PhotoLibraryViewModel
 
     @State private var isPulsing = false
@@ -76,9 +77,9 @@ struct LoadingView: View {
                     .animation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true), value: isPulsing)
             }
         }
-        .frame(width: Device.isPhone ? nil : 900.scaled, height: 12.scaled)
-        .frame(maxWidth: Device.isPhone ? .infinity : nil)
-        .padding(.horizontal, Device.isPhone ? 40.scaled : 0)
+        .frame(width: layoutStyle.isCompact ? nil : 900.scaled, height: 12.scaled)
+        .frame(maxWidth: layoutStyle.isCompact ? .infinity : nil)
+        .padding(.horizontal, layoutStyle.isCompact ? 40.scaled : 0)
     }
 }
 

@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Écran d'erreur : pas assez de destinations distinctes pour jouer.
 struct NotEnoughPlacesView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     let viewModel: PhotoLibraryViewModel
 
     @State private var showingHelp = false
@@ -47,7 +48,7 @@ struct NotEnoughPlacesView: View {
                     }
                     #endif
             }
-            .padding(.horizontal, (Device.isPhone ? 24 : 200).scaled)
+            .padding(.horizontal, (layoutStyle.isCompact ? 24 : 200).scaled)
         }
         .initialFocus($focusedButton, .demo)
     }
@@ -80,7 +81,7 @@ struct NotEnoughPlacesView: View {
 
     @ViewBuilder
     private var actionButtons: some View {
-        if Device.isPhone {
+        if layoutStyle.isCompact {
             VStack(spacing: 16.scaled) {
                 helpButton
                 demoButton

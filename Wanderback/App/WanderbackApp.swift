@@ -13,6 +13,8 @@ struct WanderbackApp: App {
                 .environment(TipStore.shared)
                 // Écoute de `Transaction.updates` dès le lancement, comme l'exige StoreKit
                 .task { await TipStore.shared.start() }
+                // iOS : style de mise en page et échelle d'après la largeur de la fenêtre
+                .windowLayout()
                 #if os(macOS)
                 .frame(minWidth: 1024, minHeight: 640)
                 #endif

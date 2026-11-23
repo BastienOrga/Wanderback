@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Cartes réponse (ville + pays) : rangée de 4 sur TV/Mac/iPad, grille 2×2 sur iPhone.
 struct AnswerOptionsView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     let options: [LocationCluster]
     let onSelect: (LocationCluster) -> Void
 
@@ -38,7 +39,7 @@ struct AnswerOptionsView: View {
     /// (~85 pt chacune) : grille 2×2. Ailleurs, la rangée du design d'origine.
     @ViewBuilder
     private var optionsContainer: some View {
-        if Device.isPhone {
+        if layoutStyle.isCompact {
             Grid(horizontalSpacing: 12.scaled, verticalSpacing: 12.scaled) {
                 ForEach(Array(stride(from: 0, to: options.count, by: 2)), id: \.self) { row in
                     GridRow {

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(\.layoutStyle) private var layoutStyle
     let viewModel: PhotoLibraryViewModel
     let onPlay: (GameMode, Int) -> Void
 
@@ -25,7 +26,7 @@ struct HomeView: View {
             SceneBackground()
             mosaicBackground
 
-            VStack(spacing: (Device.isPhone ? 26 : 44).scaled) {
+            VStack(spacing: (layoutStyle.isCompact ? 26 : 44).scaled) {
                 header
                 modeSelection
                 roundsSelection
@@ -40,7 +41,7 @@ struct HomeView: View {
             #if os(macOS)
             .macShortcutAction(.space) { activateFocusedElement() }
             #endif
-            .padding(.horizontal, Device.isPhone ? 24.scaled : 0)
+            .padding(.horizontal, layoutStyle.isCompact ? 24.scaled : 0)
         }
         .overlay(alignment: .topTrailing) { supportButton }
         .initialFocus($focusedElement, .play)
@@ -163,8 +164,8 @@ struct HomeView: View {
                         Color(hex: 0x131226).opacity(0.96)
                     ],
                     center: .center,
-                    startRadius: Device.isPhone ? 60 : 200,
-                    endRadius: Device.isPhone ? 480 : 1300
+                    startRadius: layoutStyle.isCompact ? 60 : 200,
+                    endRadius: layoutStyle.isCompact ? 480 : 1300
                 )
             )
         }
@@ -213,7 +214,7 @@ struct HomeView: View {
         }
 
         return Group {
-            if Device.isPhone {
+            if layoutStyle.isCompact {
                 VStack(spacing: 16.scaled) { tiles }
             } else {
                 HStack(spacing: 34.scaled) { tiles }
@@ -237,7 +238,7 @@ struct HomeView: View {
         }
 
         return Group {
-            if Device.isPhone {
+            if layoutStyle.isCompact {
                 // Tuile pleine largeur : icône à gauche plutôt qu'au-dessus, pour
                 // économiser la hauteur — critique sur iPhone SE (667 pt).
                 HStack(spacing: 16.scaled) {
@@ -254,8 +255,8 @@ struct HomeView: View {
             }
         }
         .foregroundStyle(.white)
-        .frame(maxWidth: Device.isPhone ? .infinity : nil, alignment: .leading)
-        .padding(Device.isPhone ? 22.scaled : 34.scaled)
+        .frame(maxWidth: layoutStyle.isCompact ? .infinity : nil, alignment: .leading)
+        .padding(layoutStyle.isCompact ? 22.scaled : 34.scaled)
     }
 
     // MARK: - Rounds
@@ -349,8 +350,8 @@ extension HomeView {
             .focused($focusedElement, equals: .support)
             .macFocusOnHover($focusedElement, equals: .support)
             .accessibilityLabel("Soutenir Wanderback")
-            .padding(.top, Device.isPhone ? 8 : 40.scaled)
-            .padding(.trailing, Device.isPhone ? 16 : 48.scaled)
+            .padding(.top, layoutStyle.isCompact ? 8 : 40.scaled)
+            .padding(.trailing, layoutStyle.isCompact ? 16 : 48.scaled)
             .transition(.opacity)
         }
     }
@@ -363,7 +364,8 @@ private extension View {
         #if os(tvOS)
         self.fullScreenCover(isPresented: isPresented) { SupportView() }
         #else
-        self.sheet(isPresented: isPresented) { SupportView() }
+        // La feuille est plus étroite que la fenêtre sur iPad : elle mesure sa propre largeur
+        self.sheet(isPresented: isPresented) { SupportView().sheetLayout() }
         #endif
     }
 }
