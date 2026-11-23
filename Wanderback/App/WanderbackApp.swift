@@ -10,6 +10,9 @@ struct WanderbackApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(TipStore.shared)
+                // Écoute de `Transaction.updates` dès le lancement, comme l'exige StoreKit
+                .task { await TipStore.shared.start() }
                 #if os(macOS)
                 .frame(minWidth: 1024, minHeight: 640)
                 #endif
